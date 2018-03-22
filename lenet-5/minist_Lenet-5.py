@@ -2,19 +2,12 @@
 import tensorflow as tf
 import numpy as np
 from readMINIST import *
+from config import *
 
 #minist数据集尺寸
 w=28
 h=28
 c=1
-
-#文件名定义
-#训练集数据
-train_images_file = "train-images-idx3-ubyte"
-train_labels_file = "train-labels-idx1-ubyte"
-#测试集数据
-valid_images_file = "t10k-images-idx3-ubyte"
-valid_labels_file = "t10k-labels-idx1-ubyte"
 
 #读取训练数据images和labels
 #读取训练集图片数据
@@ -33,8 +26,6 @@ train_labels_nums,train_labels = read_minist_label_data(train_labels_file)
 #print(valid_labels)
 
 
-#是否训练
-isTrain = False
 #打乱顺序
 #训练数据
 data = train_images 
@@ -58,7 +49,6 @@ y_val = []
 #将所有数据分为训练集和验证集
 #按照经验，8成为训练集，2成为验证集
 if isTrain:
-	ratio=0.8
 	s=np.int(nums*ratio)
 	#训练集
 	x_train=data[:s]
@@ -142,8 +132,6 @@ def minibatches(inputs=None, targets=None, batch_size=None, shuffle=False):
 n_epoch=20
 batch_size=64
 
-#训练 or 应用？
-checkpoint_dir = '' 
 sess=tf.InteractiveSession()  
 saver = tf.train.Saver()
 sess.run(tf.global_variables_initializer())
@@ -163,7 +151,7 @@ if isTrain:
     		print("\n")
     		if epoch == n_epoch - 1:
 		 	print("Saving trained mode as ckpt format!")
-		 	save_path = saver.save(sess,checkpoint_dir+'model-minist.ckpt')
+		 	save_path = saver.save(sess,checkpoint_dir+model_name)
 	    
 		#validation
 		val_loss, val_acc, n_batch = 0, 0, 0
@@ -178,21 +166,21 @@ if isTrain:
 else:
 	class_begin_idx = 0
 	class_end_idx = 0
-	saver.restore(sess, checkpoint_dir+'./model-minist.ckpt')  
-	print(label[0:20])
-	result = sess.run(logits,feed_dict={x:data[0:20]})
+	saver.restore(sess, checkpoint_dir+model_name)  
+	#print(label[0:20])
+	result = sess.run(logits,feed_dict={x:data})
 	class_index = np.argmax(result,axis=1)
 	#print(result)
 	#print(train_labels)
         #class_result = []
         correct_nums = 0
         cnt_idx = 0
-	print("The number is:\n")
-	predict_result = []
+	#print("The number is:\n")
+	#predict_result = []
         for idx in class_index:
-                #if idx == label[cnt_idx]:#是什么机制保证了softmax的十个输出分别对应了数字0到9呢？
-                #	correct_nums += 1
-		predict_result.append(idx)
+                if idx == label[cnt_idx]:#softmax的标签为0开始的整数，所以这里数字0-9刚好对应了softmax的0-9层输出
+                	correct_nums += 1
+		#predict_result.append(idx)
 		
                         #将错误图片显示出来
                 #else:
@@ -201,7 +189,7 @@ else:
                         #plt.show()
         	cnt_idx += 1
 	correct_pro = correct_nums / (len(result)*1.0)
-	print(predict_result[0:20])
+	#print(predict_result[0:20])
 	print("Input number of minist set is %d, correct num:%d, correct proportion:%f"%(len(result), correct_nums,correct_pro))
         print("\n")
 sess.close()
