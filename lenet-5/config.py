@@ -1,4 +1,5 @@
 #coding:utf-8
+#tensorflow 1.0.0
 #是否训练
 isTrain = False
 #train vs. test ratio
