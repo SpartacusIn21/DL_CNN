@@ -69,9 +69,11 @@ conv1=tf.layers.conv2d(
       inputs=x,
       filters=6,
       kernel_size=[5, 5],
-      padding="same",
+      padding="same",#因为输入图像大小就是28*28，所以这里用0填充以便保持图片尺寸
       activation=tf.nn.relu,
-      kernel_initializer=tf.truncated_normal_initializer(stddev=0.01))
+      use_bias=True,
+      kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+      bias_initializer=tf.constant_initializer(0.0))
 #第二层：最大池化层（28-->14)
 pool1=tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2)
 
@@ -82,7 +84,9 @@ conv2=tf.layers.conv2d(
       kernel_size=[5, 5],
       padding="valid",
       activation=tf.nn.relu,
-      kernel_initializer=tf.truncated_normal_initializer(stddev=0.01))
+      use_bias=True,
+      kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+      bias_initializer=tf.constant_initializer(0.0))
 #第四层：最大池化层(10-->5)
 pool2=tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
 
@@ -93,12 +97,16 @@ re1 = tf.reshape(pool2, [-1, 5 * 5 * 16])
 dense1 = tf.layers.dense(inputs=re1, 
                       units=120, 
                       activation=tf.nn.relu,
-                      kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
+		      use_bias=True,
+                      kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+		      bias_initializer=tf.constant_initializer(0.1),
                       kernel_regularizer=tf.contrib.layers.l2_regularizer(0.003))
 dense2= tf.layers.dense(inputs=dense1, 
                       units=84, 
                       activation=tf.nn.relu,
+		      use_bias=True,
                       kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
+		      bias_initializer=tf.constant_initializer(0.1),
                       kernel_regularizer=tf.contrib.layers.l2_regularizer(0.003))
 logits= tf.layers.dense(inputs=dense2, 
                         units=10, 
