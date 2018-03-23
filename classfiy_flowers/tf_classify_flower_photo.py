@@ -15,7 +15,7 @@ classfication_dic_train = {0:"daisy", 1:"dandelion", 2:"roses", 3:"sunflowers", 
 classfication_dic = {}#分类字典表
 classfication_nums = {}#存储每个分类的数量
 #读取图片
-def read_img(flower_path):
+def read_img(path):
     cate=[path+'/'+x for x in os.listdir(path) if os.path.isdir(path+'/'+x)]
     imgs=[]
     labels=[]
@@ -34,7 +34,7 @@ def read_img(flower_path):
 		if val in folder:
 			classfication_nums[val] = nums
     return np.asarray(imgs,np.float32),np.asarray(labels,np.int32)
-data,label=read_img(path)
+data,label=read_img(flower_path)
 
 print(classfication_dic)
 print(classfication_nums)
