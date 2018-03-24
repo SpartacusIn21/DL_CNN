@@ -70,7 +70,7 @@ conv1=tf.layers.conv2d(
       filters=6,
       kernel_size=[5, 5],
       padding="same",#因为输入图像大小就是28*28，所以这里用0填充以便保持图片尺寸
-      activation=tf.nn.relu,
+      activation=tf.nn.sigmoid,
       use_bias=True,
       kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
       bias_initializer=tf.constant_initializer(0.0))
@@ -135,11 +135,7 @@ def minibatches(inputs=None, targets=None, batch_size=None, shuffle=False):
         yield inputs[excerpt], targets[excerpt]
 
 
-#训练和测试数据，可将n_epoch设置更大一些
-
-n_epoch=20
-batch_size=64
-
+#开始训练
 sess=tf.InteractiveSession()  
 saver = tf.train.Saver()
 sess.run(tf.global_variables_initializer())
