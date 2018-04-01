@@ -64,7 +64,7 @@ else:
 x=tf.placeholder(tf.float32,shape=[None,w,h,c],name='x')
 y_=tf.placeholder(tf.int32,shape=[None,],name='y_')
 
-(andrew n.g. CNN 1.10)
+#(andrew n.g. CNN 1.10)
 #第一层：卷积层（28x28x3-->28x28x6)
 conv1=tf.layers.conv2d(
       inputs=x,
