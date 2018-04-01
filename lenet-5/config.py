@@ -8,11 +8,11 @@ ratio=0.8
 n_epoch=20
 batch_size=64
 #训练集数据
-train_images_file = "./minist-database/train-images-idx3-ubyte"
-train_labels_file = "./minist-database/train-labels-idx1-ubyte"
+train_images_file = "./mnist-database/train-images-idx3-ubyte"
+train_labels_file = "./mnist-database/train-labels-idx1-ubyte"
 #测试集数据
-valid_images_file = "./minist-database/t10k-images-idx3-ubyte"
-valid_labels_file = "./minist-database/t10k-labels-idx1-ubyte"
+valid_images_file = "./mnist-database/t10k-images-idx3-ubyte"
+valid_labels_file = "./mnist-database/t10k-labels-idx1-ubyte"
 #checkpoint
 checkpoint_dir = './trained_model/' 
-model_name = 'model-minist.ckpt'
+model_name = 'model-mnist.ckpt'
