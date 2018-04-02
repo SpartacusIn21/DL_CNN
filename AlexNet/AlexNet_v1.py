@@ -47,9 +47,7 @@ conv1=tf.layers.conv2d(
       kernel_size=[11, 11],
       padding="valid",
       activation=tf.nn.relu,
-      use_bias=True,
-      kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
-      bias_initializer=tf.constant_initializer(0.0))
+      kernel_initializer=tf.truncated_normal_initializer(stddev=0.1))
 #第二层：最大池化层（55x55x96-->27x27x96)
 pool1=tf.layers.max_pooling2d(inputs=conv1, pool_size=[3,3], strides=2)
 
@@ -73,9 +71,7 @@ conv3=tf.layers.conv2d(
       kernel_size=[3,3],
       padding="same",
       activation=tf.nn.relu,
-      use_bias=True,
-      kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
-      bias_initializer=tf.constant_initializer(0.0))
+      kernel_initializer=tf.truncated_normal_initializer(stddev=0.1))
 #第六层：卷积层(13x13x384->13x13x384)
 conv4=tf.layers.conv2d(
       inputs=conv3,
@@ -131,59 +127,59 @@ logits= tf.layers.dense(inputs=dropout2,
                         kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
                         kernel_regularizer=tf.contrib.layers.l2_regularizer(0.003))
 #---------------------------网络结束---------------------------
+#SGD,batch_size=128,momentum=0.9,weight_decay=0.0005
 
-#loss=tf.losses.sparse_softmax_cross_entropy(labels=y_,logits=logits)
-#train_op=tf.train.AdamOptimizer(learning_rate=0.001).minimize(loss)
-#correct_prediction = tf.equal(tf.cast(tf.argmax(logits,1),tf.int32), y_)    
-#acc= tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-#
-#
-##定义一个函数，按批次取数据
-#def minibatches(inputs=None, targets=None, batch_size=None, shuffle=False):
-#    assert len(inputs) == len(targets)
-#    if shuffle:
-#        indices = np.arange(len(inputs))
-#        np.random.shuffle(indices)
-#    for start_idx in range(0, len(inputs) - batch_size + 1, batch_size):
-#        if shuffle:
-#            excerpt = indices[start_idx:start_idx + batch_size]
-#        else:
-#            excerpt = slice(start_idx, start_idx + batch_size)
-#        yield inputs[excerpt], targets[excerpt]
-#
-#
-##开始训练
-#sess=tf.InteractiveSession()  
-#saver = tf.train.Saver()
-#sess.run(tf.global_variables_initializer())
-#
-#if isTrain:
-#	for epoch in range(n_epoch):
-#		#start_time = time.time()
-#		print("epoch %d"%epoch)
-#    		#training
-#		train_loss, train_acc, n_batch = 0, 0, 0
-#    		for x_train_a, y_train_a in minibatches(x_train, y_train, batch_size, shuffle=True):
-#			#print(x_train_a)
-#      			_,err,ac=sess.run([train_op,loss,acc], feed_dict={x: x_train_a, y_: y_train_a})
-#      			train_loss += err; train_acc += ac; n_batch += 1
-#    		print("   train loss: %f" % (train_loss/ n_batch))
-#    		print("   train acc: %f" % (train_acc/ n_batch))
-#    		print("\n")
-#    		if epoch == n_epoch - 1:
-#		 	print("Saving trained mode as ckpt format!")
-#		 	save_path = saver.save(sess,checkpoint_dir+model_name)
-#	    
-#		#validation
-#		val_loss, val_acc, n_batch = 0, 0, 0
-#		for x_val_a, y_val_a in minibatches(x_val, y_val, batch_size, shuffle=False):
-#			err, ac = sess.run([loss,acc], feed_dict={x: x_val_a, y_: y_val_a})
-#	        	val_loss += err; val_acc += ac; n_batch += 1
-#		print("   validation loss: %f" % (val_loss/ n_batch))
-#		print("   validation acc: %f" % (val_acc/ n_batch))
-#		print("\n")
-#	    
-#
+loss=tf.losses.sparse_softmax_cross_entropy(labels=y_,logits=logits)
+train_op=tf.train.AdamOptimizer(learning_rate=0.001).minimize(loss)
+correct_prediction = tf.equal(tf.cast(tf.argmax(logits,1),tf.int32), y_)    
+acc= tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+#定义一个函数，按批次取数据
+def minibatches(inputs=None, targets=None, batch_size=128, shuffle=False):
+    assert len(inputs) == len(targets)
+    if shuffle:
+        indices = np.arange(len(inputs))
+        np.random.shuffle(indices)
+    for start_idx in range(0, len(inputs) - batch_size + 1, batch_size):
+        if shuffle:
+            excerpt = indices[start_idx:start_idx + batch_size]
+        else:
+            excerpt = slice(start_idx, start_idx + batch_size)
+        yield inputs[excerpt], targets[excerpt]
+
+
+#开始训练
+sess=tf.InteractiveSession()  
+saver = tf.train.Saver()
+sess.run(tf.global_variables_initializer())
+
+if isTrain:
+	for epoch in range(n_epoch):
+		#start_time = time.time()
+		print("epoch %d"%epoch)
+    		#training
+		train_loss, train_acc, n_batch = 0, 0, 0
+    		for x_train_a, y_train_a in minibatches(x_train, y_train, batch_size, shuffle=True):
+			#print(x_train_a)
+      			_,err,ac=sess.run([train_op,loss,acc], feed_dict={x: x_train_a, y_: y_train_a})
+      			train_loss += err; train_acc += ac; n_batch += 1
+    		print("   train loss: %f" % (train_loss/ n_batch))
+    		print("   train acc: %f" % (train_acc/ n_batch))
+    		print("\n")
+    		if epoch == n_epoch - 1:
+		 	print("Saving trained mode as ckpt format!")
+		 	save_path = saver.save(sess,checkpoint_dir+model_name)
+	    
+		#validation
+		val_loss, val_acc, n_batch = 0, 0, 0
+		for x_val_a, y_val_a in minibatches(x_val, y_val, batch_size, shuffle=False):
+			err, ac = sess.run([loss,acc], feed_dict={x: x_val_a, y_: y_val_a})
+	        	val_loss += err; val_acc += ac; n_batch += 1
+		print("   validation loss: %f" % (val_loss/ n_batch))
+		print("   validation acc: %f" % (val_acc/ n_batch))
+		print("\n")
+	    
+
 #else:
 #	class_begin_idx = 0
 #	class_end_idx = 0
