@@ -2,7 +2,7 @@
 Common CNN Implementation
 
 Lenet-5
-using tensorflow to implement lenet-5 on MINIST data!
+using tensorflow to implement lenet-5 on MNIST data!
 
 
 
