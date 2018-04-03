@@ -3,7 +3,21 @@ import numpy as np
 import struct
 import matplotlib.pyplot as plt
 from skimage import transform
-#读取mnist images数据集
+
+#tf接口读取mnist数据
+##########################################################
+from tensorflow.examples.tutorials.mnist import input_data
+
+mnist = input_data.read_data_sets('./mnist-database', one_hot=True)
+
+Xtrain = mnist.train.images
+ytrain = mnist.train.labels
+Xtest = mnist.test.images
+ytest = mnist.test.labels
+##########################################################
+
+#自定义读取mnist images数据集
+##########################################################
 def read_mnist_image_data(file_name):
 	file = open(file_name,'rb')
 	buff = file.read()#一次性读取全部数据
@@ -70,4 +84,4 @@ def read_mnist_label_data(file_name):
 		labels.append(label[0])
 	file.close()
 	return number_of_labels ,np.asarray(labels,np.ubyte)
-
+##########################################################
