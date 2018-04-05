@@ -1,3 +1,4 @@
+#encoding=utf-8
 ################################################################################
 #Michael Guerzhoy and Davi Frossard, 2016
 #AlexNet implementation in TensorFlow, with weights
@@ -50,6 +51,8 @@ im1[:, :, 0], im1[:, :, 2] = im1[:, :, 2], im1[:, :, 0]
 im2 = (imread("dog2.png")[:,:,:3]).astype(float32)
 #im2 = (imread("poodle.png")[:,:,:3]).astype(int32)
 im2[:, :, 0], im2[:, :, 2] = im2[:, :, 2], im2[:, :, 0]
+print(im1.shape)
+print(im2.shape)
 
 
 ################################################################################
@@ -89,17 +92,28 @@ def conv(input, kernel, biases, k_h, k_w, c_o, s_h, s_w,  padding="VALID", group
         #input_groups = tf.split(3, group, input)
         #kernel_groups = tf.split(3, group, kernel)
 		#>= tensorflow 1.0 version
-        input_groups = tf.split(input,group,3)
-        kernel_groups = tf.split(kernel, group,3)
-        output_groups = [convolve(i, k) for i,k in zip(input_groups, kernel_groups)]
+		#print("input:%s,group:%s"%(input,group))
+		#参照论文原文将数据和核函数分成两个GPU来计算
+		input_groups = tf.split(input,group,3)
+		kernel_groups = tf.split(kernel, group,3)
+		output_groups = [convolve(i, k) for i,k in zip(input_groups, kernel_groups)]
 		#<tensorflow 1.0 version
         #conv = tf.concat(3, output_groups)
 		#>=tensorflow 1.0 version
-        conv = tf.concat(output_groups,3)
-    return  tf.reshape(tf.nn.bias_add(conv, biases), [-1]+conv.get_shape().as_list()[1:])
+		#将计算结果再合并成起来
+		conv = tf.concat(output_groups,3)
+		#print(conv.get_shape().as_list())
+		#print(conv.get_shape().as_list()[1:])
+		#print(tf.nn.bias_add(conv, biases))
+		#print([-1]+conv.get_shape().as_list()[1:])
+		#print(tf.reshape(tf.nn.bias_add(conv, biases), [-1]+conv.get_shape().as_list()[1:]))
+		#reshape貌似没什么用
+	#return  tf.reshape(tf.nn.bias_add(conv, biases), [-1]+conv.get_shape().as_list()[1:])
+    return  tf.nn.bias_add(conv, biases)
 
 
 
+print((None,)+xdim)
 x = tf.placeholder(tf.float32, (None,) + xdim)
 #x = tf.placeholder(tf.int32, (None,) + xdim)
 
@@ -108,10 +122,12 @@ x = tf.placeholder(tf.float32, (None,) + xdim)
 #conv(11, 11, 96, 4, 4, padding='VALID', name='conv1')
 k_h = 11; k_w = 11; c_o = 96; s_h = 4; s_w = 4
 conv1W = tf.Variable(net_data["conv1"][0])
+print("conv1W:%s"%conv1W)
 conv1b = tf.Variable(net_data["conv1"][1])
+print("conv1b:%s"%conv1b)
 conv1_in = conv(x, conv1W, conv1b, k_h, k_w, c_o, s_h, s_w, padding="SAME", group=1)
 conv1 = tf.nn.relu(conv1_in)
-
+print("conv1:%s"%conv1)
 #lrn1
 #lrn(2, 2e-05, 0.75, name='norm1')
 radius = 2; alpha = 2e-05; beta = 0.75; bias = 1.0
@@ -215,9 +231,11 @@ output = sess.run(prob, feed_dict = {x:[im1,im2]})
 
 
 for input_im_ind in range(output.shape[0]):
+	#从小到大排序并返回index值
     inds = argsort(output)[input_im_ind,:]
     print "Image", input_im_ind
     for i in range(5):
+		#输出名称和概率
         print class_names[inds[-1-i]], output[input_im_ind, inds[-1-i]]
 
-print time.time()-t
+print("time consumed:%s"%(time.time()-t))
