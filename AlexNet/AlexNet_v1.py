@@ -1,97 +1,148 @@
 #encoding:utf-8
 import tensorflow as tf
 import numpy as np
-from readImageNet import *
-from config import *
+from numpy import *
+import os
+from pylab import *
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.cbook as cbook
+import time
+from scipy.misc import imread
+from scipy.misc import imresize
+import matplotlib.image as mpimg
+from scipy.ndimage import filters
+import urllib
+from numpy import random
+import sys;
+sys.path.append("./toronto_edu_guerzhoy_tf_alexnet/")
+from caffe_classes import class_names
 #ImageNet数据集尺寸
 w=224
 h=224
 c=3
 #读取图片数据
-
-
-#if isTrain:
-#	arr=np.arange(nums)
-#	#print(arr)
-#	np.random.shuffle(arr)
-#	print(arr[0])
-#	data=data[arr]
-#	label=label[arr]
-#x_train = []
-#y_train = []
-#x_val = []
-#y_val = []
-##将所有数据分为训练集和验证集
-##按照经验，8成为训练集，2成为验证集
-#if isTrain:
-#	s=np.int(nums*ratio)
-#	#训练集
-#	x_train=data[:s]
-#	y_train=label[:s]
-#	#验证集
-#	x_val=data[s:]
-#	y_val=label[s:]
-#else:
-#	x_train = data
-#
+train_x = zeros((1, 227,227,3)).astype(float32)
+train_y = zeros((1, 1000))
+xdim = train_x.shape[1:]
+ydim = train_y.shape[1]
 #-----------------构建网络----------------------
 #占位符
 x=tf.placeholder(tf.float32,shape=[None,w,h,c],name='x')
 y_=tf.placeholder(tf.int32,shape=[None,],name='y_')
 
+
+def conv(input, kernel, biases, k_h, k_w, c_o, s_h, s_w,  padding="VALID", group=1):
+    '''From https://github.com/ethereon/caffe-tensorflow
+    '''
+    c_i = input.get_shape()[-1]
+    assert c_i%group==0
+    assert c_o%group==0
+    convolve = lambda i, k: tf.nn.conv2d(i, k, [1, s_h, s_w, 1], padding=padding)
+    
+    
+    if group==1:
+        conv = convolve(input, kernel)
+    else:
+		#<tensorflow 1.0 version
+        #input_groups = tf.split(3, group, input)
+        #kernel_groups = tf.split(3, group, kernel)
+		#>= tensorflow 1.0 version
+        input_groups = tf.split(input,group,3)
+        kernel_groups = tf.split(kernel, group,3)
+        output_groups = [convolve(i, k) for i,k in zip(input_groups, kernel_groups)]
+		#<tensorflow 1.0 version
+        #conv = tf.concat(3, output_groups)
+		#>=tensorflow 1.0 version
+        conv = tf.concat(output_groups,3)
+    return  tf.nn.bias_add(conv, biases)
+################################################################################
+#Read Image, and change to BGR
+
+
+im1 = (imread("./toronto_edu_guerzhoy_tf_alexnet/dog.png")[:,:,:3]).astype(float32)
+#im1 = (imread("./toronto_edu_guerzhoy_tf_alexnet/laska.png")[:,:,:3]).astype(int32)
+im1 = im1 - mean(im1)
+im1[:, :, 0], im1[:, :, 2] = im1[:, :, 2], im1[:, :, 0]
+
+im2 = (imread("./toronto_edu_guerzhoy_tf_alexnet/dog2.png")[:,:,:3]).astype(float32)
+#im2 = (imread("poodle.png")[:,:,:3]).astype(int32)
+im2[:, :, 0], im2[:, :, 2] = im2[:, :, 2], im2[:, :, 0]
+
+#In Python 3.5, change this to:
+#net_data = load(open("bvlc_alexnet.npy", "rb"), encoding="latin1").item()
+net_data = load("./toronto_edu_guerzhoy_tf_alexnet/bvlc_alexnet.npy").item()
+
+x = tf.placeholder(tf.float32, (None,) + xdim)
+################################################################################
+#For tf.nn.conv2d: 
+#filter: A Tensor. Must have the same type as input. A 4-D tensor of shape [filter_height, fil
+#For tf.layers.conv2d:
+#filters: Integer, the dimensionality of the output space (i.e. the number of filters in the 
+
 #第一层：卷积层（224x224x3-->55x55x96)
-conv1=tf.layers.conv2d(
-      inputs=x,
-      filters=96,
-	  strides=4,
-      kernel_size=[11, 11],
-      padding="valid",
-      activation=tf.nn.relu,
-      kernel_initializer=tf.truncated_normal_initializer(stddev=0.1))
+#filters:96x11x11 strides:4 padding="VALID" 
+conv1W = tf.Variable(net_data["conv1"][0])
+print("conv1W:%s"%conv1W)
+conv1b = tf.Variable(net_data["conv1"][1])
+print("conv1b:%s"%conv1b)
+print(x)
+conv1=tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(x,conv1W,[1,4,4,1],padding="VALID"),conv1b))
+print("conv1:%s"%conv1)
+conv1 = tf.reshape(conv1, [-1]+conv1.get_shape().as_list()[1:])
+print("conv1:%s"%conv1)
+#k_h = 11; k_w = 11; c_o = 96; s_h = 4; s_w = 4
+#conv1W = tf.Variable(net_data["conv1"][0])
+#print("conv1W:%s"%conv1W)
+#conv1b = tf.Variable(net_data["conv1"][1])
+#print("conv1b:%s"%conv1b)
+#conv1_in = conv(x, conv1W, conv1b, k_h, k_w, c_o, s_h, s_w, padding="SAME", group=1)
+#conv1 = tf.nn.relu(conv1_in)
+#print("conv1:%s"%conv1)
+
 #第二层：最大池化层（55x55x96-->27x27x96)
-pool1=tf.layers.max_pooling2d(inputs=conv1, pool_size=[3,3], strides=2)
+pool1=tf.layers.max_pooling2d(inputs=lrn1, pool_size=[3,3], strides=2)
+#pool1 = tf.nn.max_pool(conv1, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1], padding="VALID")
 
 #第三层：卷积层(27x27x96->27x27x256)
-conv2=tf.layers.conv2d(
-      inputs=pool1,
-      filters=256,
-      kernel_size=[5, 5],
-      padding="same",
-      activation=tf.nn.relu,
-      use_bias=True,
-      kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
-      bias_initializer=tf.constant_initializer(0.0))
+#filters:256x96x96 strides:1 padding="SAME" 
+#权重维度不对可能跟group有关，尝试将读取的权重参数合二为一
+conv2W = tf.Variable(net_data["conv2"][0])
+print("conv2W:%s"%conv2W)
+conv2b = tf.Variable(net_data["conv2"][1])
+print("conv2b:%s"%conv2b)
+conv2 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(pool1,conv2W,[1,1,1,1],padding="SAME"),conv2b))
+conv2 = tf.reshape(conv2, [-1]+conv2.get_shape().as_list()[1:])
+#k_h = 5; k_w = 5; c_o = 256; s_h = 1; s_w = 1; group = 2
+#conv2W = tf.Variable(net_data["conv2"][0])
+#conv2b = tf.Variable(net_data["conv2"][1])
+#conv2_in = conv(pool1, conv2W, conv2b, k_h, k_w, c_o, s_h, s_w, padding="SAME", group=group)
+#conv2 = tf.nn.relu(conv2_in)
+
 #第四层：最大池化层(27x27x256-->13x13x256)
-pool2=tf.layers.max_pooling2d(inputs=conv2, pool_size=[3, 3], strides=2)
+pool2=tf.layers.max_pooling2d(inputs=lrn2, pool_size=[3, 3], strides=2)
 
 #第五层：卷积层(13x13x256->13x13x384)
-conv3=tf.layers.conv2d(
-      inputs=pool2,
-      filters=384,
-      kernel_size=[3,3],
-      padding="same",
-      activation=tf.nn.relu,
-      kernel_initializer=tf.truncated_normal_initializer(stddev=0.1))
+#filters:384x3x3 strides:1 padding="SAME" 
+conv3W = tf.Variable(net_data["conv3"][0])
+conv3b = tf.Variable(net_data["conv3"][1])
+conv3=tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(pool2,conv3W,[1,1,1,1],padding="SAME"),conv3b))
+conv3=tf.reshape(conv3, [-1]+conv3.get_shape().as_list()[1:])
+
 #第六层：卷积层(13x13x384->13x13x384)
-conv4=tf.layers.conv2d(
-      inputs=conv3,
-      filters=384,
-      kernel_size=[3,3],
-      padding="same",
-      activation=tf.nn.relu,
-      use_bias=True,
-      kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
-      bias_initializer=tf.constant_initializer(0.0))
+#filters:384x3x3 strides:1 padding="SAME" 
+conv4W = tf.Variable(net_data["conv4"][0])
+conv4b = tf.Variable(net_data["conv4"][1])
+conv4=tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(conv3,conv4W,[1,1,1,1],padding="SAME"),conv4b))
+conv4 = tf.reshape(conv4, [-1]+conv4.get_shape().as_list()[1:])
+
 #第七层：卷积层(13x13x384->13x13x256)
-conv5=tf.layers.conv2d(
-      inputs=conv4,
-      filters=256,
-      kernel_size=[3,3],
-      padding="same",
-      activation=tf.nn.relu,
-      use_bias=True,
-      kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
-      bias_initializer=tf.constant_initializer(0.0))
+#filters:256x3x3 strides:1 padding="SAME" 
+conv5W = tf.Variable(net_data["conv5"][0])
+conv5b = tf.Variable(net_data["conv5"][1])
+conv5=tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(conv4,conv5W,[1,1,1,1],padding="SAME"),conv5b))
+conv5 = tf.reshape(conv5, [-1]+conv5.get_shape().as_list()[1:])
+
 #第八层：最大池化层(13x13x256-->6x6x256)
 pool3=tf.layers.max_pooling2d(inputs=conv5, pool_size=[3, 3], strides=2)
 
@@ -134,79 +185,22 @@ train_op=tf.train.AdamOptimizer(learning_rate=0.001).minimize(loss)
 correct_prediction = tf.equal(tf.cast(tf.argmax(logits,1),tf.int32), y_)    
 acc= tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-#定义一个函数，按批次取数据
-def minibatches(inputs=None, targets=None, batch_size=128, shuffle=False):
-    assert len(inputs) == len(targets)
-    if shuffle:
-        indices = np.arange(len(inputs))
-        np.random.shuffle(indices)
-    for start_idx in range(0, len(inputs) - batch_size + 1, batch_size):
-        if shuffle:
-            excerpt = indices[start_idx:start_idx + batch_size]
-        else:
-            excerpt = slice(start_idx, start_idx + batch_size)
-        yield inputs[excerpt], targets[excerpt]
-
-
 #开始训练
 sess=tf.InteractiveSession()  
 saver = tf.train.Saver()
 sess.run(tf.global_variables_initializer())
 
-if isTrain:
-	for epoch in range(n_epoch):
-		#start_time = time.time()
-		print("epoch %d"%epoch)
-    		#training
-		train_loss, train_acc, n_batch = 0, 0, 0
-    		for x_train_a, y_train_a in minibatches(x_train, y_train, batch_size, shuffle=True):
-			#print(x_train_a)
-      			_,err,ac=sess.run([train_op,loss,acc], feed_dict={x: x_train_a, y_: y_train_a})
-      			train_loss += err; train_acc += ac; n_batch += 1
-    		print("   train loss: %f" % (train_loss/ n_batch))
-    		print("   train acc: %f" % (train_acc/ n_batch))
-    		print("\n")
-    		if epoch == n_epoch - 1:
-		 	print("Saving trained mode as ckpt format!")
-		 	save_path = saver.save(sess,checkpoint_dir+model_name)
-	    
-		#validation
-		val_loss, val_acc, n_batch = 0, 0, 0
-		for x_val_a, y_val_a in minibatches(x_val, y_val, batch_size, shuffle=False):
-			err, ac = sess.run([loss,acc], feed_dict={x: x_val_a, y_: y_val_a})
-	        	val_loss += err; val_acc += ac; n_batch += 1
-		print("   validation loss: %f" % (val_loss/ n_batch))
-		print("   validation acc: %f" % (val_acc/ n_batch))
-		print("\n")
-	    
+t = time.time()
+output = sess.run(loss, feed_dict = {x:[im1,im2]})
+################################################################################
 
-#else:
-#	class_begin_idx = 0
-#	class_end_idx = 0
-#	saver.restore(sess, checkpoint_dir+model_name)  
-#	#print(label[0:20])
-#	result = sess.run(logits,feed_dict={x:data})
-#	class_index = np.argmax(result,axis=1)
-#	#print(result)
-#	#print(train_labels)
-#        #class_result = []
-#        correct_nums = 0
-#        cnt_idx = 0
-#	#print("The number is:\n")
-#	#predict_result = []
-#        for idx in class_index:
-#                if idx == label[cnt_idx]:#softmax的标签为0开始的整数，所以这里数字0-9刚好对应了softmax的0-9层输出
-#                	correct_nums += 1
-#		#predict_result.append(idx)
-#		
-#                        #将错误图片显示出来
-#                #else:
-#                        #fig = plt.figure()
-#                        #plt.imshow(data[class_begin_idx+error_idx ],cmap='binary')
-#                        #plt.show()
-#        	cnt_idx += 1
-#	correct_pro = correct_nums / (len(result)*1.0)
-#	#print(predict_result[0:20])
-#	print("Input number of mnist set is %d, correct num:%d, correct proportion:%f"%(len(result), correct_nums,correct_pro))
-#        print("\n")
-#sess.close()
+#Output:
+
+
+for input_im_ind in range(output.shape[0]):
+    inds = argsort(output)[input_im_ind,:]
+    print "Image", input_im_ind
+    for i in range(5):
+        print class_names[inds[-1-i]], output[input_im_ind, inds[-1-i]]
+
+print time.time()-t
