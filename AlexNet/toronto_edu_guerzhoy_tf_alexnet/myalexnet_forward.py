@@ -35,7 +35,9 @@ train_x = zeros((1, 227,227,3)).astype(float32)
 #train_x = zeros((1, 227,227,3)).astype(int32)
 train_y = zeros((1, 1000))
 xdim = train_x.shape[1:]
+print(xdim)
 ydim = train_y.shape[1]
+print(ydim)
 
 
 
