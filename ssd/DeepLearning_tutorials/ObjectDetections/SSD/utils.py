@@ -57,6 +57,7 @@ def bboxes_sort(classes, scores, bboxes, top_k=400):
     #     idxes = np.argsort(-scores)
     #     inside = inside[idxes]
     #     idxes = np.concatenate([idxes[inside], idxes[~inside]])
+    #取topk的时候是根据分数来排序
     idxes = np.argsort(-scores)
     classes = classes[idxes][:top_k]
     scores = scores[idxes][:top_k]

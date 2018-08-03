@@ -32,6 +32,7 @@ def ssd_size_bounds_to_values(size_bounds,
                       img_size * (ratio + step) / 100.))
     return sizes
 
+#生成一个feature map的bbox，不会考虑channels的大小，只有一个
 def ssd_anchor_one_layer(img_shape,
                          feat_shape,
                          sizes,
@@ -60,8 +61,8 @@ def ssd_anchor_one_layer(img_shape,
     # y = (y.astype(dtype) + offset) / feat_shape[0]
     # x = (x.astype(dtype) + offset) / feat_shape[1]
     # Weird SSD-Caffe computation using steps values...
-    y, x = np.mgrid[0:feat_shape[0], 0:feat_shape[1]]
-    y = (y.astype(dtype) + offset) * step / img_shape[0]
+    y, x = np.mgrid[0:feat_shape[0], 0:feat_shape[1]]#生成array([0, 1, 2])格式数据
+    y = (y.astype(dtype) + offset) * step / img_shape[0]#数组每个元素加上一个偏移:array([0.5, 1.5, 2.5],再分别乘以一个step，并归一化
     x = (x.astype(dtype) + offset) * step / img_shape[1]
 
     # Expand dims to support easy broadcasting.
@@ -71,7 +72,7 @@ def ssd_anchor_one_layer(img_shape,
     # Compute relative height and width.
     # Tries to follow the original implementation of SSD for the order.
     num_anchors = len(sizes) + len(ratios)
-    h = np.zeros((num_anchors, ), dtype=dtype)  # [n_anchors]
+    h = np.zeros((num_anchors, ), dtype=dtype)  # [n_anchors] test:np.zeros((2, ), dtype=np.float32) => array([0., 0.], dtype=float32)
     w = np.zeros((num_anchors, ), dtype=dtype)  # [n_anchors]
     # Add first anchor boxes with ratio=1.
     h[0] = sizes[0] / img_shape[0]

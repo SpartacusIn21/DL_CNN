@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e4ca19f5-7cce-45a7-a586-d7e297b2138f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/SSD_demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/SSD_demo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SSD-Tensorflow/notebooks/ssd_notebook.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SSD-Tensorflow/notebooks/ssd_notebook.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SSD-Tensorflow/notebooks/ssd_tests.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SSD-Tensorflow/notebooks/ssd_tests.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SSD-Tensorflow/ssd_Python.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SSD-Tensorflow/ssd_Python.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,12 +22,22 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="4" />
+          <entry key="py" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="4" />
+          <entry key="Python" value="5" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="py" value="517" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="Python" value="517" />
         </counts>
       </usages-collector>
     </session>
@@ -34,7 +46,11 @@
     <leaf>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ssd_layers.py">
-          <provider selected="true" editor-type-id="text-editor" />
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="630">
+              <caret line="42" column="10" selection-start-line="42" selection-start-column="10" selection-end-line="42" selection-end-column="10" />
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -52,8 +68,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1785">
-              <caret line="119" column="18" selection-start-line="119" selection-start-column="4" selection-end-line="119" selection-end-column="18" />
+            <state relative-caret-position="365">
+              <caret line="59" column="21" selection-start-line="59" selection-start-column="21" selection-end-line="59" selection-end-column="21" />
               <folding>
                 <element signature="e#32#42#0" expanded="true" />
               </folding>
@@ -64,8 +80,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ssd_300_vgg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3210">
-              <caret line="221" column="27" selection-start-line="221" selection-start-column="21" selection-end-line="221" selection-end-column="27" />
+            <state relative-caret-position="485">
+              <caret line="227" column="27" selection-start-line="227" selection-start-column="20" selection-end-line="227" selection-end-column="27" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ssd_anchors.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="193">
+              <caret line="35" column="4" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -76,19 +101,39 @@
     <findStrings>
       <find>SSD</find>
       <find>detections</find>
-      <find>images</find>
       <find>preprocess_image</find>
       <find>whiten_image</find>
+      <find>images</find>
+      <find>feat_layers</find>
+      <find>anchor_sizes</find>
+      <find>feat</find>
+      <find>anchor_bboxes</find>
+      <find>_built_net</find>
+      <find>anchors</find>
+      <find>_bboxes_decode_layer</find>
+      <find>_bboxes_select_layer</find>
+      <find>_bboxes_select</find>
+      <find>_classes</find>
+      <find>_images</find>
+      <find>process_bboxes</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../../.." />
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
-    <option name="x" value="463" />
-    <option name="y" value="77" />
-    <option name="width" value="1400" />
-    <option name="height" value="789" />
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/ssd_layers.py" />
+        <option value="$PROJECT_DIR$/ssd_anchors.py" />
+        <option value="$PROJECT_DIR$/ssd_300_vgg.py" />
+        <option value="$PROJECT_DIR$/utils.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" fullScreen="true">
+    <option name="width" value="1440" />
+    <option name="height" value="900" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -107,11 +152,6 @@
               <item name="SSD" type="b2602c69:ProjectViewProjectNode" />
               <item name="SSD" type="462c0819:PsiDirectoryNode" />
               <item name="demo" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SSD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SSD" type="462c0819:PsiDirectoryNode" />
-              <item name="ssd_checkpoints" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -149,14 +189,14 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="463" y="77" width="1400" height="789" extended-state="1" />
+    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25670776" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24947146" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Python Console" />
+      <window_info anchor="bottom" id="Python Console" weight="0.32891566" />
       <window_info anchor="bottom" id="Terminal" />
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -187,12 +227,23 @@
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/ssd_layers.py">
-      <provider selected="true" editor-type-id="text-editor" />
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="630">
+          <caret line="42" column="10" selection-start-line="42" selection-start-column="10" selection-end-line="42" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ssd_anchors.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="193">
+          <caret line="35" column="4" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="4" />
+        </state>
+      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ssd_300_vgg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3210">
-          <caret line="221" column="27" selection-start-line="221" selection-start-column="21" selection-end-line="221" selection-end-column="27" />
+        <state relative-caret-position="485">
+          <caret line="227" column="27" selection-start-line="227" selection-start-column="20" selection-end-line="227" selection-end-column="27" />
         </state>
       </provider>
     </entry>
@@ -208,8 +259,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1785">
-          <caret line="119" column="18" selection-start-line="119" selection-start-column="4" selection-end-line="119" selection-end-column="18" />
+        <state relative-caret-position="365">
+          <caret line="59" column="21" selection-start-line="59" selection-start-column="21" selection-end-line="59" selection-end-column="21" />
           <folding>
             <element signature="e#32#42#0" expanded="true" />
           </folding>

@@ -70,6 +70,7 @@ class SSD(object):
             # block 1
             net = conv2d(self._images, 64, 3, scope="conv1_1")
             net = conv2d(net, 64, 3, scope="conv1_2")
+            #保存中间层结果，用于在不同层实现多级目标的分类和检测
             self.end_points["block1"] = net
             net = max_pool2d(net, 2, scope="pool1")
             # block 2
@@ -100,6 +101,7 @@ class SSD(object):
 
             # additional SSD layers
             # block 6: use dilate conv
+            # 使用膨胀卷积的目的是为了提高感受野，这样信息才不会损失太多
             net = conv2d(net, 1024, 3, dilation_rate=6, scope="conv6")
             self.end_points["block6"] = net
             #net = dropout(net, is_training=self.is_training)
@@ -129,6 +131,7 @@ class SSD(object):
             predictions = []
             logits = []
             locations = []
+            #实现多级分类和预测，取的层配置在feat_layers中，ssd_multibox_layer主要是用3x3卷积核计算loc和cls卷积结果
             for i, layer in enumerate(self.ssd_params.feat_layers):
                 cls, loc = ssd_multibox_layer(self.end_points[layer], self.ssd_params.num_classes,
                                               self.ssd_params.anchor_sizes[i],
@@ -200,13 +203,16 @@ class SSD(object):
 
     def _bboxes_select(self, predictions, locations):
         """Select all bboxes predictions, only for bacth_size=1"""
+        #根据框的宽高以及比例生成锚框
         anchor_bboxes_list = self.anchors()
         classes_list = []
         scores_list = []
         bboxes_list = []
         # select bboxes for each feat layer
+        #predictions为每个feat layer的类别softmax输出,locations为网络位置输出（四个值，中心点坐标和w,h相对值)
         for n in range(len(predictions)):
             anchor_bboxes = list(map(tf.convert_to_tensor, anchor_bboxes_list[n]))
+            #根据锚框和网络分类和位置输出得出分类以及分数、框
             classes, scores, bboxes = self._bboxes_select_layer(predictions[n],
                             locations[n], anchor_bboxes, self.ssd_params.prior_scaling)
             classes_list.append(classes)
